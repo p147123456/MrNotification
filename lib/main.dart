@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false, // dialog is dismissible with a tap on the barrier
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('新增一項任務',style: TextStyle(color: NColors.MainColor),),
+          title: Text('新增任務',style: TextStyle(color: NColors.MainColor),),
           content: TextFormField(
             //initialValue:ConfigInfo.remindNum.toString(),
             inputFormatters: [
