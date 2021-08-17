@@ -17,6 +17,7 @@ class todoItem{
 
   Map<String, dynamic> toJson() {
     return {
+      'id':id,
       'todoitem': todoitem,
       'time' : time.toIso8601String(),
     };
@@ -37,35 +38,36 @@ class TodoListDBManager extends DatabaseHelper{
   final String todolistTable = "todolist" ;
 
   //插入資料
-  void insertShopInfo(todoItem _todoItem) async {
+  void insertTodoItem(todoItem _todoItem) async {
     int idx = await this.insertRecord(todolistTable,_todoItem.toJson());
     print('--- insert 執行結束---' );
   }
 
   //查詢資料
-  Future<List<todoItem>> queryAllOfShopInfo() async {
-    final rows = await queryAll(todolistTable);
-    print('查詢結果:$rows');
+  Future<List<todoItem>> queryAllOTodoItem() async {
     List<todoItem> data = new List<todoItem>();
+    final rows = await queryAll(todolistTable);
+    if(rows == null) return data;
+    print('查詢結果:$rows');
     rows.forEach((row) => data.add(new todoItem().fromJson(row)));
     print('--- query 執行結束---');
     return data;
   }
 
   //更新資料
-  void updateShopInfo(todoItem _todoItem) async {
+  void updateTodoItem(todoItem _todoItem) async {
     this.updateRecord(todolistTable, _todoItem.toJson(), "id=?", [_todoItem.id]) ;
     print('--- update 執行結束---');
   }
 
   //刪除資料
-  void deleteShopInfo(int id) async {
+  void deleteTodoItem(int id) async {
     this.deleteRecord(todolistTable, "id = ?",[id]);
     print('--- delete 執行結束---');
   }
 
   //刪除所有資料
-  void deleteAllShopInfo() async {
+  void deleteAllTodoItem() async {
     super.deleteAll(todolistTable);
     print('--- deleteAll 執行結束---');
   }
