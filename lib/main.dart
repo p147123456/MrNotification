@@ -17,11 +17,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mr Notification',
+      title: '通知君',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
-      home: MyHomePage(title: 'Mr Notification'),
+      home: MyHomePage(title: '通知君'),
     );
   }
 }
@@ -36,84 +36,110 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Timer timer;
   List<todoItem> mItemLst = [];
-  int _notifiactionSecond = 60;
+  int _notificationSecond = 60;
   Future _incrementItem(BuildContext context) async {
-    String todoitem;
-    DateTime time;
+    final _mFormKey = GlobalKey<FormState>();
+    String _todoItem;
+    DateTime _time = DateTime.now();
     return showDialog(
       context: context,
       barrierDismissible: false, //
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('新增待辦事項',style: TextStyle(color: NColors.MainColor),),
-          content: Column(children: [
-            TextFormField(
-              keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
-              onChanged: (v){
-                todoitem = v;
-              },
-              decoration: new InputDecoration(
-                labelText: "請待辦事項",
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: const BorderSide(color: NColors.MainColor, width: 1.5),
-                ),
-                border: const OutlineInputBorder(),
-                labelStyle: new TextStyle(color: NColors.MainColor),
-              ),
+        return StatefulBuilder(builder:(context,setState){
+          return AlertDialog(
+            title: Text('新增待辦事項',style: TextStyle(color: NColors.MainColor),),
+            content: Form(
+              key: _mFormKey,
+              child:Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
+                    onChanged: (v){
+                      _todoItem = v;
+                    },
+                    validator: (msg) {
+                      if(msg.isEmpty) return "請輸入待辦事項";
+                      return null;
+                    } ,
+                    decoration: new InputDecoration(
+                      labelText: "請輸入待辦事項",
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: const BorderSide(color: NColors.MainColor, width: 1.5),
+                      ),
+                      border: const OutlineInputBorder(),
+                      labelStyle: new TextStyle(color: NColors.MainColor),
+                    ),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                          ),
+                          onPressed: () {
+                            DatePicker.showDateTimePicker(context,
+                                showTitleActions: true,
+                                minTime: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+                                maxTime: DateTime(DateTime.now().year+10, DateTime.now().month+10, DateTime.now().day+10),
+                                onChanged: (date) {
+                                  print('change $date');
+                                }, onConfirm: (date) {
+                                  setState(() {
+                                    _time = date;
+                                  });
+                                  print('confirm $date');
+                                }, currentTime: DateTime.now(), locale: LocaleType.zh);
+                          },
+                          child: Text(
+                            "${_time.year}/${_time.month}/${_time.day}-${_time.hour}:${_time.minute}",
+                            style: TextStyle(color: Colors.white,fontSize: 25),
+                          )))
+                ],),
             ),
-            TextButton(
+            actions: [
+              TextButton(
+                child: Text('確認',style: TextStyle(color: NColors.MainColor),),
                 onPressed: () {
-                  DatePicker.showDateTimePicker(context,
-                      showTitleActions: true,
-                      minTime: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
-                      maxTime: DateTime(DateTime.now().year+10, DateTime.now().month+10, DateTime.now().day+10),
-                      onChanged: (date) {
-                        print('change $date');
-                      }, onConfirm: (date) {
-                        time = date;
-                        print('confirm $date');
-                      }, currentTime: DateTime.now(), locale: LocaleType.zh);
+                  if(!_mFormKey.currentState.validate()) return;
+                  todoItem data = new todoItem(todoitem: _todoItem,time: _time);
+                  TodoListDBManager.instance.insertTodoItem(data);
+                    mItemLst.add(data);
+                  Navigator.of(context).pop();
                 },
-                child: Text(
-                  '請選擇待辦事項時間',
-                  style: TextStyle(color: Colors.blue),
-                ))
-          ],),
-          actions: [
-            TextButton(
-              child: Text('確認',style: TextStyle(color: NColors.MainColor),),
-              onPressed: () {
-                todoItem data = new todoItem(todoitem: todoitem,time: time);
-                TodoListDBManager.instance.insertTodoItem(data);
-                setState(() {
-                  mItemLst.add(data);
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+              ),
+              TextButton(
+                child: Text('取消',style: TextStyle(color: NColors.MainColor),),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
         );
       },
     );
   }
-  Future _SettingDlg(BuildContext context) async {
-    int seconds;
+  Future _settingDlg(BuildContext context) async {
     return showDialog(
       context: context,
       barrierDismissible: false, //
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('設定',style: TextStyle(color: NColors.MainColor),),
-          content: Column(children: [
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             TextFormField(
-              initialValue: _notifiactionSecond.toString(),
+              initialValue: _notificationSecond.toString(),
               inputFormatters: [
                 new LengthLimitingTextInputFormatter(10),// for mobile
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
               ],
               keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
               onChanged: (v){
-                seconds = int.tryParse(v);
+                _notificationSecond = int.tryParse(v);
               },
               decoration: new InputDecoration(
                 labelText: "多久提醒一次(單位:秒)",
@@ -129,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: Text('確認',style: TextStyle(color: NColors.MainColor),),
               onPressed: () {
-                Record.writeIntByKey("NotificationSecond", seconds);
+                Record.writeIntByKey("NotificationSecond", _notificationSecond);
                 Navigator.of(context).pop();
               },
             ),
@@ -141,42 +167,75 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
+        elevation: 10,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+        ),
         title: Text(widget.title),
         actions: <Widget>[
-          PopupMenuButton(
-            icon: Icon(
-              Icons.settings,
-              color: Colors.white,
-            ),
-            itemBuilder: (BuildContext bc) => [
-              PopupMenuItem(child: Text("設定"), value: "/Setting"),
-            ],
-            onSelected: (route) {
-              switch(route){
-                case "/Setting":
-                  _SettingDlg(context);
-                  break;
-              }
-            },
-          )
+          IconButton(onPressed:() =>_settingDlg(context).then((value) => _startTimer(_notificationSecond)),icon: Icon(
+            Icons.settings,
+            color: Colors.white,
+          ),)
         ],
       ),
       body:Center(
         child: ListView.builder(
           itemCount: mItemLst.length,
             itemBuilder: (context, index) {
-             return ListTile(
-              title: Text('${mItemLst[index].todoitem}'),
-              subtitle: Text('${mItemLst[index].time}'),
-              trailing: IconButton(icon: Icon(Icons.delete),onPressed:() {
-                TodoListDBManager.instance.deleteTodoItem(mItemLst[index].id);
-                setState(() {mItemLst.remove(mItemLst[index]);});
-              }));
+            return Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  elevation: 10,
+                  color: Colors.white,
+                  child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      title: Text('${mItemLst[index].todoitem}'),
+                      subtitle: Text('${mItemLst[index].time.year}/${mItemLst[index].time.month}/${mItemLst[index].time.day}-${mItemLst[index].time.hour}:${mItemLst[index].time.second}'),
+                      trailing: IconButton(icon: Icon(Icons.delete),onPressed:() {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false, //
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Text('是否要刪除${mItemLst[index].todoitem}任務？'),
+                              actions: [
+                                TextButton(
+                                  child: Text('確認',style: TextStyle(color: NColors.MainColor),),
+                                  onPressed: () {
+                                    TodoListDBManager.instance.deleteTodoItem(mItemLst[index].id);
+                                    setState(() {mItemLst.remove(mItemLst[index]);});
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text('取消',style: TextStyle(color: NColors.MainColor),),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }))
+                ),
+              );
       },)),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed:(){_incrementItem(context);},
+        onPressed:(){_incrementItem(context).then((value) {
+          setState(() {
+
+          });
+        });},
         icon: Icon(Icons.add,color: Colors.white,size: 40,),
         label: Text('新增待辦事項'),
       ),
@@ -187,17 +246,19 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    Record.init().then((value) => null);
+    Record.init().then((value) {
+      _notificationSecond = Record.readIntByKey("NotificationSecond");
+    });
     LocalNotifications.instance.init();
     TodoListDBManager.instance.init().then((value){
       TodoListDBManager.instance.queryAllOTodoItem().then((value) => mItemLst = value);
     });
-    _startTimer();
+    _startTimer(_notificationSecond);
   }
 
-  void _startTimer()
+  void _startTimer(int second)
   {
-    timer = Timer.periodic(Duration(seconds: _notifiactionSecond), (timer)
+    timer =new Timer.periodic(Duration(seconds: second), (timer)
     {
       for(var obj in mItemLst)
         {

@@ -1,5 +1,5 @@
 import 'dart:ui';
 
 class NColors{
-  static const Color MainColor = Color.fromRGBO(18, 84, 142, 1.0);
+  static const Color MainColor = Color.fromRGBO(8, 127, 35, 1.0);
 }
