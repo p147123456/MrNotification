@@ -251,7 +251,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     LocalNotifications.instance.init();
     TodoListDBManager.instance.init().then((value){
-      TodoListDBManager.instance.queryAllOTodoItem().then((value) => mItemLst = value);
+      TodoListDBManager.instance.queryAllOTodoItem().then((value) => setState(() {
+        mItemLst = value;
+      }));
     });
     _startTimer(_notificationSecond);
   }
@@ -269,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
             int NowMinuteAmount = (DateTime.now().hour*60) + (DateTime.now().minute);
             if(NowMinuteAmount >= TargetMinuteAmount)
             {
-              LocalNotifications.instance.show("提醒通知", "你的任務${obj.todoitem}時間已經到了!!快去做吧!!");
+              LocalNotifications.instance.show("提醒通知", "你的任務：${obj.todoitem}，時間已經到了!!快去做吧!!");
             }
           }
         }
