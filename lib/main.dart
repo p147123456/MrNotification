@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 }, currentTime: DateTime.now(), locale: LocaleType.zh);
                           },
                           child: Text(
-                            "${_time.year}年/${_time.month}月/${_time.day}日${_time.hour}時:${_time.minute}分",
+                            "${_time.year}年/${_time.month}月/${_time.day}日${_time.hour}點:${_time.minute}分",
                             style: TextStyle(color: Colors.white),
                           )))
                 ],),
@@ -199,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ListTile(
                       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                       title: Text('${mItemLst[index].todoitem}'),
-                      subtitle: Text('${mItemLst[index].time.year}/${mItemLst[index].time.month}/${mItemLst[index].time.day}-${mItemLst[index].time.hour}:${mItemLst[index].time.second}'),
+                      subtitle: Text('${mItemLst[index].time.year}年/${mItemLst[index].time.month}月/${mItemLst[index].time.day}日${mItemLst[index].time.hour}點:${mItemLst[index].time.minute}分'),
                       trailing: IconButton(icon: Icon(Icons.delete),onPressed:() {
                         showDialog(
                           context: context,
