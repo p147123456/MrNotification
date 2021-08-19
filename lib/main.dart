@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                       child: ElevatedButton(
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0))),
                           ),
                           onPressed: () {
                             DatePicker.showDateTimePicker(context,
@@ -92,8 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 }, currentTime: DateTime.now(), locale: LocaleType.zh);
                           },
                           child: Text(
-                            "${_time.year}/${_time.month}/${_time.day}-${_time.hour}:${_time.minute}",
-                            style: TextStyle(color: Colors.white,fontSize: 25),
+                            "${_time.year}年/${_time.month}月/${_time.day}日${_time.hour}時:${_time.minute}分",
+                            style: TextStyle(color: Colors.white),
                           )))
                 ],),
             ),
