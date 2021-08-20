@@ -54,8 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
-                    keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
-                    onChanged: (v){
+                    onSaved: (v){
                       _todoItem = v;
                     },
                     validator: (msg) {
@@ -71,7 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       labelStyle: new TextStyle(color: NColors.MainColor),
                     ),
                   ),
-                  Padding(
+                  Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                       child: ElevatedButton(
                           style: ButtonStyle(
@@ -91,17 +91,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                   print('confirm $date');
                                 }, currentTime: DateTime.now(), locale: LocaleType.zh);
                           },
-                          child: Text(
-                            "${_time.year}年${_time.month}月${_time.day}日\n${_time.hour}點${_time.minute}分",
-                            style: TextStyle(color: Colors.white),
-                          )))
-                ],),
-            ),
+                          child: FittedBox(
+                            fit: BoxFit.contain,
+                            child:Text(
+                              "${_time.year}年${_time.month}月${_time.day}日${_time.hour}點${_time.minute}分",
+                              style: TextStyle(color: Colors.white),))))
+                          ],),),
             actions: [
               TextButton(
                 child: Text('確認',style: TextStyle(color: NColors.MainColor),),
                 onPressed: () {
                   if(!_mFormKey.currentState.validate()) return;
+                  _mFormKey.currentState.save();
                   todoItem data = new todoItem(todoitem: _todoItem,time: _time);
                   TodoListDBManager.instance.insertTodoItem(data);
                     mItemLst.add(data);
