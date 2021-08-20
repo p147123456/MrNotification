@@ -249,6 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     Record.init().then((value) {
       _notificationSecond = Record.readIntByKey("NotificationSecond");
+      if(_notificationSecond==0) _notificationSecond=60;
     });
     LocalNotifications.instance.init();
     TodoListDBManager.instance.init().then((value){
